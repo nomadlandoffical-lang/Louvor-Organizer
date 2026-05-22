@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizador de Equipe de Louvor</title>
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --primary: #1e2a3a;
+            --primary-light: #2c3e6b;
+            --accent: #c8a951;
+            --accent-hover: #b8932f;
+            --accent-light: #f5ecd7;
+            --text: #2d3436;
+            --text-light: #636e72;
+            --border: #e0e4e8;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.10);
+            --radius: 14px;
+            --radius-sm: 10px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --danger: #e74c3c;
+            --danger-hover: #c0392b;
+            --success: #27ae60;
+            --info: #3498db;
+            --celebracao: #e74c3c;
+            --adoracao: #3498db;
+            --meiotermo: #8e44ad;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            -webkit-tap-highlight-color: transparent;
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--primary);
+            color: #fff;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.18);
+        }
+        .header .logo-icon {
+            font-size: 28px;
+            line-height: 1;
+        }
+        .header h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            flex: 1;
+        }
+        .header .badge-beta {
+            font-size: 0.65rem;
+            background: var(--accent);
+            color: #1e2a3a;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            padding: 16px;
+            max-width: 960px;
+            width: 100%;
+            margin: 0 auto;
+            overflow-y: auto;
+        }
+        .tab-panel {
+            display: none;
+            animation: fadeSlide 0.35s ease;
+        }
+        .tab-panel.active {
+            display: block;
+        }
+        @keyframes fadeSlide {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Bottom nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            display: flex;
+            border-top: 1px solid var(--border);
+            z-index: 100;
+            box-shadow: 0 -3px 16px rgba(0, 0, 0, 0.07);
+            padding-bottom: env(safe-area-inset-bottom, 0);
+        }
+        .bottom-nav .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px 6px 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-light);
+            font-size: 0.7rem;
+            font-weight: 500;
+            position: relative;
+            border: none;
+            background: none;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .bottom-nav .nav-item .nav-icon {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 2px;
+            transition: var(--transition);
+        }
+        .bottom-nav .nav-item.active {
+            color: var(--primary-light);
+            font-weight: 700;
+        }
+        .bottom-nav .nav-item.active .nav-icon {
+            transform: scale(1.1);
+        }
+        .bottom-nav .nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 0 0 4px 4px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid transparent;
+            cursor: default;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: #e8e8e8;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .card-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--primary);
+            letter-spacing: -0.2px;
+        }
+        .card-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+
+        /* Badges/Tags */
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        .tag-celebracao {
+            background: #fde8e8;
+            color: #c0392b;
+        }
+        .tag-adoracao {
+            background: #e3f0fb;
+            color: #2471a3;
+        }
+        .tag-meiotermo {
+            background: #f3e8f9;
+            color: #7d3c98;
+        }
+        .tag-meio-termo {
+            background: #f3e8f9;
+            color: #7d3c98;
+        }
+        .tag-dia {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .tag-semana {
+            background: #d4edda;
+            color: #155724;
+        }
+        .tag-mes {
+            background: #d6eaf8;
+            color: #1a5276;
+        }
+        .tag-role {
+            background: #eef1f5;
+            color: #4a5568;
+            font-weight: 500;
+            margin: 2px 4px 2px 0;
+            display: inline-block;
+            font-size: 0.68rem;
+            padding: 3px 9px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            font-family: var(--font);
+            letter-spacing: -0.1px;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #1e2a3a;
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(200, 169, 81, 0.35);
+        }
+        .btn-outline {
+            background: #fff;
+            color: var(--primary-light);
+            border: 2px solid #d0d5dd;
+        }
+        .btn-outline:hover {
+            border-color: var(--primary-light);
+            background: #f8f9fb;
+        }
+        .btn-danger {
+            background: #fff;
+            color: var(--danger);
+            border: 2px solid #f5c6cb;
+        }
+        .btn-danger:hover {
+            background: #fef5f5;
+            border-color: var(--danger);
+        }
+        .btn-sm {
+            padding: 6px 13px;
+            font-size: 0.73rem;
+            border-radius: 20px;
+        }
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            padding: 0;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: #f5f5f5;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-icon:hover {
+            background: #e8e8e8;
+        }
+        .btn-random {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            font-size: 0.9rem;
+            padding: 12px 24px;
+            border-radius: 30px;
+            animation: pulse 2.5s infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(118, 75, 162, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 14px rgba(118, 75, 162, 0);
+            }
+        }
+        .btn-random:hover {
+            animation: none;
+            transform: scale(1.04);
+        }
+
+        /* Section title */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 18px 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: -0.3px;
+        }
+        .section-title .icon {
+            font-size: 1.3rem;
+        }
+
+        /* Flex utilities */
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .flex-grow {
+            flex: 1;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .mt-2 {
+            margin-top: 8px;
+        }
+        .mt-3 {
+            margin-top: 14px;
+        }
+        .mb-2 {
+            margin-bottom: 8px;
+        }
+        .mb-3 {
+            margin-bottom: 14px;
+        }
+        .gap-sm {
+            gap: 6px;
+        }
+        .gap-md {
+            gap: 12px;
+        }
+
+        /* Info row */
+        .info-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 14px;
+            font-size: 0.78rem;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+        .info-row span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .info-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .dot-celebracao {
+            background: var(--celebracao);
+        }
+        .dot-adoracao {
+            background: var(--adoracao);
+        }
+        .dot-meiotermo {
+            background: var(--meiotermo);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+            padding: 16px;
+        }
+        .modal-overlay.hidden {
+            display: none;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .modal {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 22px 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 85vh;
+            max-height: 85dvh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .modal h3 {
+            font-size: 1.15rem;
+            margin-bottom: 16px;
+            color: var(--primary);
+            letter-spacing: -0.2px;
+        }
+        .modal label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+            color: var(--text);
+            letter-spacing: -0.1px;
+        }
+        .modal input,
+        .modal select,
+        .modal textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: var(--font);
+            margin-bottom: 12px;
+            transition: var(--transition);
+            background: #fafbfc;
+            color: var(--text);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .modal input:focus,
+        .modal select:focus,
+        .modal textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(200, 169, 81, 0.1);
+            background: #fff;
+        }
+        .modal textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+        .modal .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .modal .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 500;
+            transition: var(--transition);
+            background: #fafbfc;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .modal .checkbox-label:has(input:checked) {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            font-weight: 600;
+        }
+        .modal .checkbox-label input {
+            display: none;
+        }
+        .modal .btn-row {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+        .empty-state .empty-icon {
+            font-size: 3.5rem;
+            margin-bottom: 12px;
+            opacity: 0.6;
+        }
+        .empty-state p {
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e2a3a;
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 25px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            z-index: 300;
+            animation: toastIn 0.35s ease, toastOut 0.35s ease 2s forwards;
+            pointer-events: none;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-10px);
+            }
+        }
+
+        /* Filter bar */
+        .filter-bar {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .filter-chip {
+            padding: 7px 14px;
+            border-radius: 20px;
+            border: 2px solid var(--border);
+            background: #fff;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-family: var(--font);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .filter-chip.active {
+            background: var(--primary-light);
+            color: #fff;
+            border-color: var(--primary-light);
+            font-weight: 700;
+        }
+        .filter-chip:hover:not(.active) {
+            background: #f5f6f8;
+        }
+
+        .search-field {
+            position: relative;
+            margin-bottom: 12px;
+        }
+        .search-field input {
+            width: 100%;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px 12px 40px;
+            background: #fff;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.9rem;
+            box-shadow: var(--shadow);
+        }
+        .search-field input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(200, 169, 81, 0.12);
+        }
+        .search-field span {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            pointer-events: none;
+        }
+
+        /* Dashboard */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .summary-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            box-shadow: var(--shadow);
+        }
+        .summary-number {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+        .summary-label {
+            color: var(--text-light);
+            font-size: 0.78rem;
+            margin-top: 5px;
+        }
+        .notice-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+        }
+        .notice-card strong {
+            color: var(--primary);
+        }
+        .notice-card p {
+            color: var(--text-light);
+            font-size: 0.82rem;
+            margin-top: 4px;
+            line-height: 1.45;
+        }
+
+        /* Setlist panel */
+        .setlist-panel {
+            background: #fffef9;
+            border: 2px dashed var(--accent);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            margin-top: 16px;
+            min-height: 50px;
+        }
+        .setlist-panel h4 {
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .setlist-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 10px 0 12px;
+        }
+        .setlist-meta label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-light);
+            display: block;
+            margin-bottom: 4px;
+        }
+        .setlist-meta input,
+        .setlist-meta select {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px 10px;
+            background: #fff;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.82rem;
+        }
+        .setlist-scale-card {
+            background: #fff;
+            border: 1px solid #f0e8d0;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+        .setlist-status {
+            background: #fff;
+            border-radius: 8px;
+            padding: 9px 10px;
+            margin-bottom: 8px;
+            border: 1px solid #f0e8d0;
+            font-size: 0.78rem;
+            color: var(--text-light);
+            line-height: 1.35;
+        }
+        .setlist-status.ok {
+            border-color: #cdebd8;
+            background: #f5fbf7;
+            color: #1e7e43;
+        }
+        .setlist-status.warn {
+            border-color: #f5dfae;
+            background: #fffaf0;
+            color: #8a650f;
+        }
+        .setlist-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 10px;
+            background: #fff;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            font-size: 0.82rem;
+            gap: 8px;
+            border: 1px solid #f0e8d0;
+        }
+        .setlist-item .remove-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #c0392b;
+            font-size: 1.1rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        .setlist-item .remove-btn:hover {
+            background: #fde8e8;
+        }
+
+        /* Responsive - Desktop */
+        @media (min-width: 768px) {
+            body {
+                padding-bottom: 0;
+                flex-direction: row;
+            }
+            .header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 220px;
+                height: 100vh;
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 24px 18px;
+                gap: 24px;
+                z-index: 50;
+            }
+            .header h1 {
+                font-size: 1.1rem;
+                flex: 0 0 auto;
+            }
+            .main-content {
+                margin-left: 220px;
+                padding: 24px 28px;
+                max-width: 1100px;
+                width: calc(100% - 220px);
+                padding-bottom: 40px;
+            }
+            .bottom-nav {
+                display: none;
+            }
+            .desktop-tabs {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                width: 100%;
+                margin-top: 8px;
+            }
+            .desktop-tab {
+                padding: 11px 14px;
+                border-radius: 10px;
+                cursor: pointer;
+                color: #bcc5d0;
+                font-weight: 500;
+                font-size: 0.85rem;
+                transition: var(--transition);
+                border: none;
+                background: transparent;
+                text-align: left;
+                width: 100%;
+                font-family: var(--font);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .desktop-tab:hover {
+                background: rgba(255, 255, 255, 0.06);
+                color: #fff;
+            }
+            .desktop-tab.active {
+                background: rgba(255, 255, 255, 0.12);
+                color: #fff;
+                font-weight: 700;
+            }
+            .desktop-tab .dt-icon {
+                font-size: 1.2rem;
+                width: 24px;
+                text-align: center;
+            }
+            .card-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 14px;
+            }
+            .modal {
+                max-width: 540px;
+                padding: 28px 26px;
+            }
+        }
+        @media (max-width: 767px) {
+            .desktop-tabs {
+                display: none;
+            }
+            .header .logo-icon {
+                font-size: 24px;
+            }
+            .header h1 {
+                font-size: 1.05rem;
+            }
+            .card-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .summary-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .setlist-meta {
+                grid-template-columns: 1fr;
+            }
+            .btn {
+                min-height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <span class="logo-icon">🎵</span>
+        <h1>Louvor Organizer</h1>
+        <span class="badge-beta">Beta</span>
+        <!-- Desktop tabs -->
+        <nav class="desktop-tabs" id="desktopTabs">
+            <button class="desktop-tab active" data-tab="resumo">
+                <span class="dt-icon">◎</span> Resumo
+            </button>
+            <button class="desktop-tab" data-tab="equipe">
+                <span class="dt-icon">👥</span> Equipe
+            </button>
+            <button class="desktop-tab" data-tab="escala">
+                <span class="dt-icon">📅</span> Escala
+            </button>
+            <button class="desktop-tab" data-tab="repertorio">
+                <span class="dt-icon">🎶</span> Repertório
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Tab: Resumo -->
+        <section class="tab-panel active" id="tab-resumo">
+            <div class="flex-between mb-3">
+                <h2 class="section-title"><span class="icon">◎</span> Visão Geral</h2>
+            </div>
+            <div class="summary-grid" id="summaryGrid"></div>
+            <div class="notice-card">
+                <strong>Próximo passo natural</strong>
+                <p>Cadastre a equipe, monte uma escala por dia, semana ou mês, e depois escolha o repertório para gerar uma setlist pronta para compartilhar.</p>
+            </div>
+            <div id="nextScheduleBox"></div>
+        </section>
+
+        <!-- Tab: Equipe -->
+        <section class="tab-panel" id="tab-equipe">
+            <div class="flex-between mb-3">
+                <h2 class="section-title"><span class="icon">👥</span> Membros da Equipe</h2>
+                <button class="btn btn-primary btn-sm" id="btnAddMembro">+ Adicionar</button>
+            </div>
+            <div id="equipeList" class="card-grid">
+                <div class="empty-state">
+                    <div class="empty-icon">🙋</div>
+                    <p>Nenhum membro cadastrado</p>
+                    <p style="font-size:0.78rem;">Clique em "Adicionar" para começar</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab: Escala -->
+        <section class="tab-panel" id="tab-escala">
+            <div class="flex-between mb-3">
+                <h2 class="section-title"><span class="icon">📅</span> Escalas</h2>
+                <button class="btn btn-primary btn-sm" id="btnAddEscala">+ Nova Escala</button>
+            </div>
+            <div class="filter-bar" id="escalaFilter">
+                <button class="filter-chip active" data-filter="all">Todas</button>
+                <button class="filter-chip" data-filter="dia">📆 Dia</button>
+                <button class="filter-chip" data-filter="semana">📅 Semana</button>
+                <button class="filter-chip" data-filter="mes">🗓️ Mês</button>
+            </div>
+            <div id="escalaList" class="card-grid">
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <p>Nenhuma escala criada</p>
+                    <p style="font-size:0.78rem;">Crie sua primeira escala para organizar os horários</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab: Repertório -->
+        <section class="tab-panel" id="tab-repertorio">
+            <div class="flex-between mb-3">
+                <h2 class="section-title"><span class="icon">🎶</span> Repertório de Louvores</h2>
+                <div class="flex-row gap-sm">
+                    <button class="btn btn-random btn-sm" id="btnAleatorizar">🎲 Aleatorizar Setlist</button>
+                    <button class="btn btn-primary btn-sm" id="btnAddMusica">+ Adicionar</button>
+                </div>
+            </div>
+            <div class="filter-bar" id="repertorioFilter">
+                <button class="filter-chip active" data-filter="all">Todos</button>
+                <button class="filter-chip" data-filter="celebração">🔥 Celebração</button>
+                <button class="filter-chip" data-filter="adoração">🙏 Adoração</button>
+                <button class="filter-chip" data-filter="meio-termo">⚖️ Meio-Termo</button>
+            </div>
+            <div class="search-field">
+                <span>⌕</span>
+                <input type="search" id="repertorioSearch" placeholder="Procurar canção ou artista">
+            </div>
+            <div id="repertorioList" class="card-grid">
+                <div class="empty-state">
+                    <div class="empty-icon">🎼</div>
+                    <p>Nenhuma música cadastrada</p>
+                    <p style="font-size:0.78rem;">Adicione louvores ao repertório</p>
+                </div>
+            </div>
+            <!-- Setlist Panel -->
+            <div class="setlist-panel" id="setlistPanel">
+                <h4>📝 Setlist Atual <span style="font-weight:400;font-size:0.7rem;color:#888;" id="setlistCount">(0 músicas)</span></h4>
+                <div class="setlist-meta">
+                    <div style="grid-column:1 / -1;">
+                        <label for="setlistEscala">Escala vinculada</label>
+                        <select id="setlistEscala"></select>
+                    </div>
+                </div>
+                <div id="setlistScaleInfo" class="setlist-scale-card"></div>
+                <div id="setlistStatus" class="setlist-status"></div>
+                <div id="setlistItems">
+                    <p style="font-size:0.78rem;color:#999;">Nenhuma música na setlist. Clique em + nas músicas ou use "Aleatorizar".</p>
+                </div>
+                <div class="flex-row gap-sm mt-2" id="setlistActions" style="display:none;">
+                    <button class="btn btn-outline btn-sm" id="btnLimparSetlist">🗑️ Limpar</button>
+                    <button class="btn btn-sm" style="background:#25D366;color:#fff;" id="btnCompartilharSetlist" title="Compartilhar ou copiar aviso">📱 Compartilhar</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Nav (Mobile) -->
+    <nav class="bottom-nav" id="bottomNav">
+        <button class="nav-item active" data-tab="resumo">
+            <span class="nav-icon">◎</span> Resumo
+        </button>
+        <button class="nav-item" data-tab="equipe">
+            <span class="nav-icon">👥</span> Equipe
+        </button>
+        <button class="nav-item" data-tab="escala">
+            <span class="nav-icon">📅</span> Escala
+        </button>
+        <button class="nav-item" data-tab="repertorio">
+            <span class="nav-icon">🎶</span> Repertório
+        </button>
+    </nav>
+
+    <!-- Modal overlay -->
+    <div class="modal-overlay hidden" id="modalOverlay">
+        <div class="modal" id="modalContent"></div>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toastContainer"></div>
+
+    <script>
+        (function() {
+            // ============ DATA MANAGER ============
+            const STORAGE_KEY = 'louvor_organizer_data';
+
+            function getData() {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                const defaults = {
+                    equipe: [],
+                    escalas: [],
+                    repertorio: [],
+                    setlist: [],
+                    setlistMeta: {
+                        tipo: 'dia',
+                        data: new Date().toISOString().split('T')[0],
+                        escalaId: ''
+                    },
+                    setlistsByEscala: {}
+                };
+                if (!raw) return defaults;
+                try {
+                    const parsed = JSON.parse(raw);
+                    return {
+                        ...defaults,
+                        ...parsed,
+                        setlistMeta: { ...defaults.setlistMeta, ...(parsed.setlistMeta || {}) },
+                        setlistsByEscala: parsed.setlistsByEscala || {}
+                    };
+                } catch (e) {
+                    return defaults;
+                }
+            }
+
+            function saveData(data) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            }
+
+            function generateId() {
+                return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+            }
+
+            function normalizeText(str) {
+                return (str || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            }
+
+            // ============ STATE ============
+            let appData = getData();
+            let currentTab = 'resumo';
+            let escalaFilter = 'all';
+            let repertorioFilter = 'all';
+            let repertorioSearch = '';
+
+            // ============ DOM REFS ============
+            const mainContent = document.getElementById('mainContent');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalContent = document.getElementById('modalContent');
+            const toastContainer = document.getElementById('toastContainer');
+            const bottomNavItems = document.querySelectorAll('.bottom-nav .nav-item');
+            const desktopTabs = document.querySelectorAll('.desktop-tab');
+            const tabPanels = document.querySelectorAll('.tab-panel');
+
+            // ============ TOAST ============
+            function showToast(msg) {
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.textContent = msg;
+                toastContainer.appendChild(toast);
+                setTimeout(() => toast.remove(), 2400);
+            }
+
+            // ============ MODAL ============
+            function openModal(html) {
+                modalContent.innerHTML = html;
+                modalOverlay.classList.remove('hidden');
+                // Focus first input if exists
+                setTimeout(() => {
+                    const firstInput = modalContent.querySelector('input, select, textarea');
+                    if (firstInput) firstInput.focus();
+                }, 150);
+            }
+
+            function closeModal() {
+                modalOverlay.classList.add('hidden');
+                modalContent.innerHTML = '';
+            }
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) closeModal();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal();
+            });
+
+            // ============ TAB SWITCHING ============
+            function switchTab(tabName) {
+                currentTab = tabName;
+                // Update panels
+                tabPanels.forEach(p => p.classList.remove('active'));
+                const panel = document.getElementById('tab-' + tabName);
+                if (panel) panel.classList.add('active');
+                // Update bottom nav
+                bottomNavItems.forEach(n => {
+                    n.classList.toggle('active', n.dataset.tab === tabName);
+                });
+                // Update desktop tabs
+                desktopTabs.forEach(d => {
+                    d.classList.toggle('active', d.dataset.tab === tabName);
+                });
+                // Scroll to top
+                mainContent.scrollTop = 0;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Refresh view
+                renderAll();
+            }
+
+            bottomNavItems.forEach(item => {
+                item.addEventListener('click', () => switchTab(item.dataset.tab));
+            });
+            desktopTabs.forEach(item => {
+                item.addEventListener('click', () => switchTab(item.dataset.tab));
+            });
+
+            // ============ RENDER FUNCTIONS ============
+            function renderAll() {
+                appData = getData();
+                renderResumo();
+                renderEquipe();
+                renderEscalas();
+                renderRepertorio();
+                renderSetlist();
+            }
+
+            function getSelectedEscala() {
+                const escalas = appData.escalas || [];
+                const selectedId = appData.setlistMeta && appData.setlistMeta.escalaId;
+                return escalas.find(e => e.id === selectedId) || null;
+            }
+
+            function getSetlistIds() {
+                const escala = getSelectedEscala();
+                if (!escala) return [];
+                const byEscala = appData.setlistsByEscala || {};
+                return byEscala[escala.id] || [];
+            }
+
+            function setSetlistIds(ids) {
+                const escala = getSelectedEscala();
+                if (!escala) return false;
+                if (!appData.setlistsByEscala) appData.setlistsByEscala = {};
+                appData.setlistsByEscala[escala.id] = ids;
+                appData.setlist = ids;
+                appData.setlistMeta = {
+                    ...(appData.setlistMeta || {}),
+                    escalaId: escala.id,
+                    tipo: escala.tipo,
+                    data: escala.data
+                };
+                saveData(appData);
+                return true;
+            }
+
+            function getSelectedSetlistMusicas() {
+                const musicas = appData.repertorio || [];
+                return getSetlistIds().map(id => musicas.find(m => m.id === id)).filter(Boolean);
+            }
+
+            function getSetlistValidation(musicas) {
+                const total = musicas.length;
+                const adoracao = musicas.filter(m => m.categoria === 'adoração').length;
+                if (total >= 3 && adoracao >= 2) {
+                    return { ok: true, text: `Recomendação atendida: ${total} canções, sendo ${adoracao} de adoração.` };
+                }
+                const pendencias = [];
+                if (total < 3) pendencias.push(`adicione mais ${3 - total} canção${3 - total > 1 ? 'ões' : ''}`);
+                if (adoracao < 2) pendencias.push(`inclua mais ${2 - adoracao} de adoração`);
+                return { ok: false, text: `Recomendação: no mínimo 3 canções e pelo menos 2 de adoração. Falta ${pendencias.join(' e ')}.` };
+            }
+
+            // -- Resumo --
+            function renderResumo() {
+                const summaryGrid = document.getElementById('summaryGrid');
+                const nextScheduleBox = document.getElementById('nextScheduleBox');
+                if (!summaryGrid || !nextScheduleBox) return;
+
+                const equipe = appData.equipe || [];
+                const escalas = appData.escalas || [];
+                const repertorio = appData.repertorio || [];
+                const setlist = getSetlistIds();
+                summaryGrid.innerHTML = [
+                    ['Equipe', equipe.length],
+                    ['Escalas', escalas.length],
+                    ['Músicas', repertorio.length],
+                    ['Na setlist', setlist.length]
+                ].map(([label, value]) => `
+                    <div class="summary-card">
+                        <div class="summary-number">${value}</div>
+                        <div class="summary-label">${label}</div>
+                    </div>
+                `).join('');
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const next = [...escalas]
+                    .filter(e => new Date(e.data + 'T00:00:00') >= today)
+                    .sort((a, b) => new Date(a.data) - new Date(b.data))[0];
+
+                if (!next) {
+                    nextScheduleBox.innerHTML = `
+                        <div class="notice-card">
+                            <strong>Nenhuma próxima escala</strong>
+                            <p>Quando você criar uma escala futura, ela aparece aqui como referência rápida para preparar equipe e repertório.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const membros = (next.membrosIds || []).map(id => (appData.equipe || []).find(m => m.id === id)).filter(Boolean);
+                const dateStr = new Date(next.data + 'T00:00:00').toLocaleDateString('pt-BR', {
+                    weekday: 'long',
+                    day: '2-digit',
+                    month: 'long'
+                });
+                nextScheduleBox.innerHTML = `
+                    <div class="notice-card">
+                        <strong>Próxima escala: ${dateStr}</strong>
+                        <p>${membros.length ? membros.map(m => escapeHtml(m.nome)).join(', ') : 'Ainda sem membros designados.'}</p>
+                    </div>
+                `;
+            }
+
+            // -- Equipe --
+            function renderEquipe() {
+                const container = document.getElementById('equipeList');
+                const membros = appData.equipe || [];
+                if (membros.length === 0) {
+                    container.innerHTML = `
+                    <div class="empty-state">
+                      <div class="empty-icon">🙋</div>
+                      <p>Nenhum membro cadastrado</p>
+                      <p style="font-size:0.78rem;">Clique em "Adicionar" para começar</p>
+                    </div>`;
+                    return;
+                }
+                container.innerHTML = membros.map(m => `
+                  <div class="card">
+                    <div class="card-header">
+                      <div>
+                        <div class="card-title">${escapeHtml(m.nome)}</div>
+                        <div class="card-subtitle">${escapeHtml(m.funcao || 'Sem função definida')}</div>
+                      </div>
+                      <div class="flex-row gap-sm">
+                        <button class="btn-icon" title="Editar" onclick="window._editMembro('${m.id}')" style="font-size:0.9rem;">✏️</button>
+                        <button class="btn-icon" title="Remover" onclick="window._deleteMembro('${m.id}')" style="font-size:0.9rem;color:#e74c3c;">🗑️</button>
+                      </div>
+                    </div>
+                    <div class="info-row">
+                      ${m.telefone ? `<span>📞 ${escapeHtml(m.telefone)}</span>` : ''}
+                      ${m.email ? `<span>📧 ${escapeHtml(m.email)}</span>` : ''}
+                      ${m.whatsapp ? '<span style="color:#25D366;">✅ WhatsApp</span>' : ''}
+                    </div>
+                    ${!m.telefone && !m.email ? '<span style="font-size:0.7rem;color:#bbb;">Nenhum contato informado</span>' : ''}
+                  </div>
+                `).join('');
+            }
+
+            // -- Escalas --
+            function renderEscalas() {
+                const container = document.getElementById('escalaList');
+                let escalas = appData.escalas || [];
+                // Filter
+                if (escalaFilter !== 'all') {
+                    escalas = escalas.filter(e => e.tipo === escalaFilter);
+                }
+                // Sort by date descending
+                escalas.sort((a, b) => new Date(b.data) - new Date(a.data));
+                if (escalas.length === 0) {
+                    container.innerHTML = `
+                    <div class="empty-state">
+                      <div class="empty-icon">📋</div>
+                      <p>Nenhuma escala encontrada</p>
+                      <p style="font-size:0.78rem;">Crie uma nova escala para começar</p>
+                    </div>`;
+                    return;
+                }
+                container.innerHTML = escalas.map(e => {
+                    const tipoLabel = { dia: 'Dia', semana: 'Semana', mes: 'Mês' } [e.tipo] || e
+                        .tipo;
+                    const dateStr = new Date(e.data + 'T00:00:00').toLocaleDateString('pt-BR', {
+                        weekday: 'long',
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                    const membrosNomes = (e.membrosIds || []).map(id => {
+                        const m = (appData.equipe || []).find(mb => mb.id === id);
+                        return m ? m.nome : null;
+                    }).filter(Boolean);
+                    return `
+                    <div class="card">
+                      <div class="card-header">
+                        <div>
+                          <div class="card-title">${dateStr}</div>
+                          <span class="tag tag-${e.tipo}">📌 ${tipoLabel}</span>
+                        </div>
+                        <div class="flex-row gap-sm">
+                          <button class="btn-icon" title="Editar" onclick="window._editEscala('${e.id}')" style="font-size:0.9rem;">✏️</button>
+                          <button class="btn-icon" title="Remover" onclick="window._deleteEscala('${e.id}')" style="font-size:0.9rem;color:#e74c3c;">🗑️</button>
+                        </div>
+                      </div>
+                      <div class="flex-row gap-sm mt-2">
+                        ${membrosNomes.length > 0 ? membrosNomes.map(n => `<span class="tag tag-role">${escapeHtml(n)}</span>`).join('') : '<span style="font-size:0.75rem;color:#bbb;">Nenhum membro designado</span>'}
+                      </div>
+                      ${e.observacao ? `<p style="font-size:0.75rem;color:#888;margin-top:6px;">📝 ${escapeHtml(e.observacao)}</p>` : ''}
+                    </div>
+                  `;
+                }).join('');
+            }
+
+            // -- Repertorio --
+            function renderRepertorio() {
+                const container = document.getElementById('repertorioList');
+                let musicas = appData.repertorio || [];
+                if (repertorioFilter !== 'all') {
+                    musicas = musicas.filter(m => m.categoria === repertorioFilter);
+                }
+                const term = normalizeText(repertorioSearch);
+                if (term) {
+                    musicas = musicas.filter(m => normalizeText(`${m.nome} ${m.artista || ''}`).includes(term));
+                }
+                if (musicas.length === 0) {
+                    container.innerHTML = `
+                    <div class="empty-state">
+                      <div class="empty-icon">🎼</div>
+                      <p>Nenhuma música encontrada</p>
+                      <p style="font-size:0.78rem;">Adicione louvores ou ajuste o filtro</p>
+                    </div>`;
+                    return;
+                }
+                container.innerHTML = musicas.map(m => {
+                    const catLabel = { 'celebração': 'Celebração', 'adoração': 'Adoração',
+                        'meio-termo': 'Meio-Termo' } [m.categoria] || m.categoria;
+                    const dotClass = { 'celebração': 'dot-celebracao', 'adoração': 'dot-adoracao',
+                        'meio-termo': 'dot-meiotermo' } [m.categoria] || '';
+                    const isInSetlist = getSetlistIds().includes(m.id);
+                    return `
+                    <div class="card" style="${isInSetlist ? 'border-left: 3px solid var(--accent);' : ''}">
+                      <div class="card-header">
+                        <div>
+                          <div class="card-title">${escapeHtml(m.nome)}</div>
+                          <div class="card-subtitle">${escapeHtml(m.artista || 'Artista não informado')}</div>
+                        </div>
+                        <div class="flex-row gap-sm">
+                          ${isInSetlist ? '<span style="font-size:0.7rem;color:var(--accent);font-weight:700;">✓ Na Setlist</span>' : ''}
+                          <button class="btn-icon" title="${isInSetlist ? 'Remover da Setlist' : 'Adicionar à Setlist'}" onclick="window._toggleSetlist('${m.id}')" style="font-size:1rem;${isInSetlist ? 'color:var(--accent);' : ''}">${isInSetlist ? '⭐' : '☆'}</button>
+                          <button class="btn-icon" title="Editar" onclick="window._editMusica('${m.id}')" style="font-size:0.9rem;">✏️</button>
+                          <button class="btn-icon" title="Remover" onclick="window._deleteMusica('${m.id}')" style="font-size:0.9rem;color:#e74c3c;">🗑️</button>
+                        </div>
+                      </div>
+                      <div class="flex-row gap-sm mt-2">
+                        <span class="tag tag-${m.categoria}"><span class="info-dot ${dotClass}"></span> ${catLabel}</span>
+                        ${m.tom ? `<span class="tag tag-role">🎹 Tom: ${escapeHtml(m.tom)}</span>` : ''}
+                        ${m.bpm ? `<span class="tag tag-role">🕐 ${m.bpm} BPM</span>` : ''}
+                      </div>
+                      <div class="info-row mt-2">
+                        ${m.link ? `<span>🔗 <a href="${escapeHtml(m.link)}" target="_blank" rel="noopener" style="color:var(--info);text-decoration:none;font-weight:500;">Ouvir/Ver</a></span>` : ''}
+                      </div>
+                    </div>
+                  `;
+                }).join('');
+            }
+
+            // -- Setlist --
+            function renderSetlist() {
+                const container = document.getElementById('setlistItems');
+                const countSpan = document.getElementById('setlistCount');
+                const actionsDiv = document.getElementById('setlistActions');
+                const escalaInput = document.getElementById('setlistEscala');
+                const scaleInfo = document.getElementById('setlistScaleInfo');
+                const statusBox = document.getElementById('setlistStatus');
+                const escalas = [...(appData.escalas || [])].sort((a, b) => new Date(a.data) - new Date(b.data));
+                const meta = appData.setlistMeta || {};
+
+                if (!meta.escalaId && escalas.length > 0) {
+                    appData.setlistMeta = { ...meta, escalaId: escalas[0].id, tipo: escalas[0].tipo, data: escalas[0].data };
+                    if (appData.setlist && appData.setlist.length && !appData.setlistsByEscala[escalas[0].id]) {
+                        appData.setlistsByEscala[escalas[0].id] = appData.setlist;
+                    }
+                    saveData(appData);
+                }
+
+                if (escalaInput) {
+                    escalaInput.innerHTML = escalas.length
+                        ? escalas.map(e => {
+                            const dateStr = new Date(e.data + 'T00:00:00').toLocaleDateString('pt-BR');
+                            const tipoLabel = { dia: 'Dia', semana: 'Semana', mes: 'Mês' } [e.tipo] || e.tipo;
+                            return `<option value="${e.id}">${dateStr} - ${tipoLabel}</option>`;
+                        }).join('')
+                        : '<option value="">Crie uma escala primeiro</option>';
+                    escalaInput.value = appData.setlistMeta.escalaId || '';
+                }
+
+                const escala = getSelectedEscala();
+                const setlistMusicas = getSelectedSetlistMusicas();
+                countSpan.textContent = `(${setlistMusicas.length} música${setlistMusicas.length !== 1 ? 's' : ''})`;
+                if (!escala) {
+                    scaleInfo.innerHTML = 'Selecione ou crie uma escala para vincular a setlist com uma equipe.';
+                    statusBox.className = 'setlist-status warn';
+                    statusBox.textContent = 'A setlist precisa estar ligada a uma escala antes de receber músicas.';
+                    container.innerHTML = '<p style="font-size:0.78rem;color:#999;">Crie uma escala na aba Escala e depois volte para montar o repertório.</p>';
+                    actionsDiv.style.display = 'none';
+                    return;
+                }
+
+                const membros = (escala.membrosIds || [])
+                    .map(id => (appData.equipe || []).find(m => m.id === id))
+                    .filter(Boolean);
+                const escalaData = new Date(escala.data + 'T00:00:00').toLocaleDateString('pt-BR', {
+                    weekday: 'long',
+                    day: '2-digit',
+                    month: 'long'
+                });
+                scaleInfo.innerHTML = `
+                    <strong>Escala: ${escalaData}</strong><br>
+                    Equipe: ${membros.length ? membros.map(m => escapeHtml(m.nome)).join(', ') : 'nenhum membro definido'}
+                `;
+                const validation = getSetlistValidation(setlistMusicas);
+                statusBox.className = `setlist-status ${validation.ok ? 'ok' : 'warn'}`;
+                statusBox.textContent = validation.text;
+
+                if (setlistMusicas.length === 0) {
+                    container.innerHTML =
+                        '<p style="font-size:0.78rem;color:#999;">Nenhuma música nesta escala. Clique em ☆ nas músicas ou use "Aleatorizar".</p>';
+                    actionsDiv.style.display = 'none';
+                } else {
+                    container.innerHTML = setlistMusicas.map((m, i) => `
+                    <div class="setlist-item">
+                      <span><strong>${i + 1}.</strong> ${escapeHtml(m.nome)} <span style="color:#888;font-size:0.7rem;">(${escapeHtml(m.artista || '?')})</span></span>
+                      <span class="flex-row gap-sm" style="align-items:center;">
+                        <span class="tag tag-${m.categoria}" style="font-size:0.65rem;">${m.categoria === 'celebração' ? '🔥' : m.categoria === 'adoração' ? '🙏' : '⚖️'}</span>
+                        ${m.tom ? `<span style="font-size:0.7rem;color:#888;">${escapeHtml(m.tom)}</span>` : ''}
+                        <button class="remove-btn" onclick="window._toggleSetlist('${m.id}')" title="Remover">×</button>
+                      </span>
+                    </div>
+                  `).join('');
+                    actionsDiv.style.display = 'flex';
+                }
+            }
+
+            function escapeHtml(str) {
+                if (!str) return '';
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            // ============ CRUD OPERATIONS ============
+            // -- Membro --
+            window._editMembro = function(id) {
+                const m = (appData.equipe || []).find(mb => mb.id === id);
+                if (!m) return;
+                openModal(`
+                  <h3>✏️ Editar Membro</h3>
+                  <label>Nome</label>
+                  <input type="text" id="mNome" value="${escapeHtml(m.nome)}" placeholder="Nome do integrante">
+                  <label>Função</label>
+                  <select id="mFuncao">
+                    <option value="">Selecione...</option>
+                    ${['Vocal','Backing Vocal','Violão','Guitarra','Teclado','Baixo','Bateria','Percussão','Sopros','Técnico de Som','Projeção','Direção de Louvor','Outro'].map(f => `<option value="${f}" ${m.funcao === f ? 'selected' : ''}>${f}</option>`).join('')}
+                  </select>
+                  <label>Telefone (opcional)</label>
+                  <input type="tel" id="mTelefone" value="${escapeHtml(m.telefone || '')}" placeholder="(00) 00000-0000">
+                  <label>Email (opcional)</label>
+                  <input type="email" id="mEmail" value="${escapeHtml(m.email || '')}" placeholder="email@exemplo.com">
+                  <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                    <input type="checkbox" id="mWhatsapp" ${m.whatsapp ? 'checked' : ''} style="width:auto;margin:0;">
+                    Possui WhatsApp (para futuro envio de avisos)
+                  </label>
+                  <div class="btn-row">
+                    <button class="btn btn-outline btn-sm" onclick="closeModal()">Cancelar</button>
+                    <button class="btn btn-primary btn-sm" id="btnSaveMembro">Salvar</button>
+                  </div>
+                `);
+                document.getElementById('btnSaveMembro').addEventListener('click', () => {
+                    m.nome = document.getElementById('mNome').value.trim();
+                    m.funcao = document.getElementById('mFuncao').value;
+                    m.telefone = document.getElementById('mTelefone').value.trim();
+                    m.email = document.getElementById('mEmail').value.trim();
+                    m.whatsapp = document.getElementById('mWhatsapp').checked;
+                    if (!m.nome) { showToast('⚠️ Nome é obrigatório'); return; }
+                    saveData(appData);
+                    closeModal();
+                    renderAll();
+                    showToast('✅ Membro atualizado!');
+                });
+            };
+            window._deleteMembro = function(id) {
+                if (!confirm('Tem certeza que deseja remover este membro? Esta ação não pode ser desfeita.')) return;
+                appData.equipe = (appData.equipe || []).filter(m => m.id !== id);
+                // Also remove from escalas
+                (appData.escalas || []).forEach(e => {
+                    e.membrosIds = (e.membrosIds || []).filter(mid => mid !== id);
+                });
+                saveData(appData);
+                renderAll();
+                showToast('🗑️ Membro removido');
+            };
+
+            document.getElementById('btnAddMembro').addEventListener('click', () => {
+                openModal(`
+                  <h3>👤 Novo Membro</h3>
+                  <label>Nome *</label>
+                  <input type="text" id="mNome" placeholder="Nome do integrante">
+                  <label>Função</label>
+                  <select id="mFuncao">
+                    <option value="">Selecione...</option>
+                    ${['Vocal','Backing Vocal','Violão','Guitarra','Teclado','Baixo','Bateria','Percussão','Sopros','Técnico de Som','Projeção','Direção de Louvor','Outro'].map(f => `<option value="${f}">${f}</option>`).join('')}
+                  </select>
+                  <label>Telefone (opcional)</label>
+                  <input type="tel" id="mTelefone" placeholder="(00) 00000-0000">
+                  <label>Email (opcional)</label>
+                  <input type="email" id="mEmail" placeholder="email@exemplo.com">
+                  <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                    <input type="checkbox" id="mWhatsapp" style="width:auto;margin:0;">
+                    Possui WhatsApp (para futuro envio de avisos)
+                  </label>
+                  <div class="btn-row">
+                    <button class="btn btn-outline btn-sm" onclick="closeModal()">Cancelar</button>
+                    <button class="btn btn-primary btn-sm" id="btnSaveMembro">Salvar</button>
+                  </div>
+                `);
+                document.getElementById('btnSaveMembro').addEventListener('click', () => {
+                    const nome = document.getElementById('mNome').value.trim();
+                    if (!nome) { showToast('⚠️ Nome é obrigatório'); return; }
+                    const novo = {
+                        id: generateId(),
+                        nome,
+                        funcao: document.getElementById('mFuncao').value,
+                        telefone: document.getElementById('mTelefone').value.trim(),
+                        email: document.getElementById('mEmail').value.trim(),
+                        whatsapp: document.getElementById('mWhatsapp').checked,
+                    };
+                    if (!appData.equipe) appData.equipe = [];
+                    appData.equipe.push(novo);
+                    saveData(appData);
+                    closeModal();
+                    renderAll();
+                    showToast('✅ Membro adicionado!');
+                });
+            });
+
+            // -- Escala --
+            window._editEscala = function(id) {
+                const e = (appData.escalas || []).find(es => es.id === id);
+                if (!e) return;
+                openEscalaModal(e);
+            };
+            window._deleteEscala = function(id) {
+                if (!confirm('Remover esta escala?')) return;
+                appData.escalas = (appData.escalas || []).filter(es => es.id !== id);
+                if (appData.setlistsByEscala) delete appData.setlistsByEscala[id];
+                if (appData.setlistMeta && appData.setlistMeta.escalaId === id) {
+                    const next = (appData.escalas || [])[0];
+                    appData.setlistMeta = next
+                        ? { ...appData.setlistMeta, escalaId: next.id, tipo: next.tipo, data: next.data }
+                        : { ...appData.setlistMeta, escalaId: '', tipo: 'dia', data: new Date().toISOString().split('T')[0] };
+                    appData.setlist = next && appData.setlistsByEscala ? (appData.setlistsByEscala[next.id] || []) : [];
+                }
+                saveData(appData);
+                renderAll();
+                showToast('🗑️ Escala removida');
+            };
+
+            function openEscalaModal(existing = null) {
+                const membros = appData.equipe || [];
+                const selectedIds = existing ? (existing.membrosIds || []) : [];
+                const membrosCheckboxes = membros.map(m => `
+                  <label class="checkbox-label">
+                    <input type="checkbox" value="${m.id}" ${selectedIds.includes(m.id) ? 'checked' : ''}>
+                    ${escapeHtml(m.nome)} ${m.funcao ? `(${escapeHtml(m.funcao)})` : ''}
+                  </label>
+                `).join('');
+                openModal(`
+                  <h3>${existing ? '✏️ Editar' : '📅 Nova'} Escala</h3>
+                  <label>Data</label>
+                  <input type="date" id="eData" value="${existing ? existing.data : new Date().toISOString().split('T')[0]}">
+                  <label>Tipo</label>
+                  <select id="eTipo">
+                    <option value="dia" ${existing && existing.tipo === 'dia' ? 'selected' : ''}>📆 Dia específico</option>
+                    <option value="semana" ${existing && existing.tipo === 'semana' ? 'selected' : ''}>📅 Semana</option>
+                    <option value="mes" ${existing && existing.tipo === 'mes' ? 'selected' : ''}>🗓️ Mês</option>
+                  </select>
+                  <label>Membros designados</label>
+                  <div class="checkbox-group" id="eMembrosCheckboxes">
+                    ${membros.length > 0 ? membrosCheckboxes : '<p style="font-size:0.75rem;color:#999;">Cadastre membros primeiro na aba Equipe</p>'}
+                  </div>
+                  <label>Observação (opcional)</label>
+                  <textarea id="eObs" placeholder="Ex: Culto da manhã, ensaio extra...">${existing ? escapeHtml(existing.observacao || '') : ''}</textarea>
+                  <div class="btn-row">
+                    <button class="btn btn-outline btn-sm" onclick="closeModal()">Cancelar</button>
+                    <button class="btn btn-primary btn-sm" id="btnSaveEscala">Salvar</button>
+                  </div>
+                `);
+                document.getElementById('btnSaveEscala').addEventListener('click', () => {
+                    const data = document.getElementById('eData').value;
+                    if (!data) { showToast('⚠️ Selecione uma data'); return; }
+                    const checkboxes = document.querySelectorAll('#eMembrosCheckboxes input[type=checkbox]:checked');
+                    const membrosIds = Array.from(checkboxes).map(cb => cb.value);
+                    const escalaObj = {
+                        id: existing ? existing.id : generateId(),
+                        data,
+                        tipo: document.getElementById('eTipo').value,
+                        membrosIds,
+                        observacao: document.getElementById('eObs').value.trim(),
+                    };
+                    if (!appData.escalas) appData.escalas = [];
+                    if (existing) {
+                        const idx = appData.escalas.findIndex(es => es.id === existing.id);
+                        if (idx >= 0) appData.escalas[idx] = escalaObj;
+                    } else {
+                        appData.escalas.push(escalaObj);
+                    }
+                    saveData(appData);
+                    closeModal();
+                    renderAll();
+                    showToast('✅ Escala salva!');
+                });
+            }
+            document.getElementById('btnAddEscala').addEventListener('click', () => openEscalaModal());
+
+            // Escala filter
+            document.getElementById('escalaFilter').addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-chip')) {
+                    document.querySelectorAll('#escalaFilter .filter-chip').forEach(c => c.classList
+                        .remove('active'));
+                    e.target.classList.add('active');
+                    escalaFilter = e.target.dataset.filter;
+                    renderEscalas();
+                }
+            });
+
+            // -- Musica --
+            window._editMusica = function(id) {
+                const m = (appData.repertorio || []).find(mu => mu.id === id);
+                if (!m) return;
+                openMusicaModal(m);
+            };
+            window._deleteMusica = function(id) {
+                if (!confirm('Remover esta música do repertório?')) return;
+                appData.repertorio = (appData.repertorio || []).filter(mu => mu.id !== id);
+                appData.setlist = (appData.setlist || []).filter(sid => sid !== id);
+                Object.keys(appData.setlistsByEscala || {}).forEach(escalaId => {
+                    appData.setlistsByEscala[escalaId] = appData.setlistsByEscala[escalaId].filter(sid => sid !== id);
+                });
+                saveData(appData);
+                renderAll();
+                showToast('🗑️ Música removida');
+            };
+            window._toggleSetlist = function(id) {
+                if (!getSelectedEscala()) {
+                    showToast('⚠️ Selecione uma escala para montar a setlist');
+                    return;
+                }
+                const ids = [...getSetlistIds()];
+                const idx = ids.indexOf(id);
+                if (idx >= 0) {
+                    ids.splice(idx, 1);
+                    showToast('Removido da setlist');
+                } else {
+                    ids.push(id);
+                    showToast('⭐ Adicionado à setlist!');
+                }
+                setSetlistIds(ids);
+                renderRepertorio();
+                renderSetlist();
+                renderResumo();
+            };
+
+            function openMusicaModal(existing = null) {
+                const tomOptions = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',
+                    'Cm', 'C#m', 'Dm', 'D#m', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bm'
+                ];
+                openModal(`
+                  <h3>${existing ? '✏️ Editar' : '🎵 Nova'} Música</h3>
+                  <label>Nome da Canção *</label>
+                  <input type="text" id="muNome" value="${existing ? escapeHtml(existing.nome) : ''}" placeholder="Nome do louvor">
+                  <label>Artista / Grupo</label>
+                  <input type="text" id="muArtista" value="${existing ? escapeHtml(existing.artista || '') : ''}" placeholder="Ex: Hillsong, Fernandinho...">
+                  <label>Categoria</label>
+                  <select id="muCategoria">
+                    <option value="celebração" ${existing && existing.categoria === 'celebração' ? 'selected' : ''}>🔥 Celebração</option>
+                    <option value="adoração" ${existing && existing.categoria === 'adoração' ? 'selected' : ''}>🙏 Adoração</option>
+                    <option value="meio-termo" ${existing && existing.categoria === 'meio-termo' ? 'selected' : ''}>⚖️ Meio-Termo</option>
+                  </select>
+                  <label>Tom da Música</label>
+                  <select id="muTom">
+                    <option value="">Não informado</option>
+                    ${tomOptions.map(t => `<option value="${t}" ${existing && existing.tom === t ? 'selected' : ''}>${t}</option>`).join('')}
+                  </select>
+                  <label>BPM (opcional)</label>
+                  <input type="number" id="muBpm" value="${existing ? (existing.bpm || '') : ''}" placeholder="Ex: 120" min="1" max="300">
+                  <label>Link (YouTube/Spotify - opcional)</label>
+                  <input type="url" id="muLink" value="${existing ? escapeHtml(existing.link || '') : ''}" placeholder="https://...">
+                  <div class="btn-row">
+                    <button class="btn btn-outline btn-sm" onclick="closeModal()">Cancelar</button>
+                    <button class="btn btn-primary btn-sm" id="btnSaveMusica">Salvar</button>
+                  </div>
+                `);
+                document.getElementById('btnSaveMusica').addEventListener('click', () => {
+                    const nome = document.getElementById('muNome').value.trim();
+                    if (!nome) { showToast('⚠️ Nome da canção é obrigatório'); return; }
+                    const musicaObj = {
+                        id: existing ? existing.id : generateId(),
+                        nome,
+                        artista: document.getElementById('muArtista').value.trim(),
+                        categoria: document.getElementById('muCategoria').value,
+                        tom: document.getElementById('muTom').value,
+                        bpm: document.getElementById('muBpm').value ? parseInt(document.getElementById(
+                            'muBpm').value) : null,
+                        link: document.getElementById('muLink').value.trim(),
+                    };
+                    if (!appData.repertorio) appData.repertorio = [];
+                    if (existing) {
+                        const idx = appData.repertorio.findIndex(mu => mu.id === existing.id);
+                        if (idx >= 0) appData.repertorio[idx] = musicaObj;
+                    } else {
+                        appData.repertorio.push(musicaObj);
+                    }
+                    saveData(appData);
+                    closeModal();
+                    renderAll();
+                    showToast('✅ Música salva!');
+                });
+            }
+            document.getElementById('btnAddMusica').addEventListener('click', () => openMusicaModal());
+
+            // Repertorio filter
+            document.getElementById('repertorioFilter').addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-chip')) {
+                    document.querySelectorAll('#repertorioFilter .filter-chip').forEach(c => c.classList
+                        .remove('active'));
+                    e.target.classList.add('active');
+                    repertorioFilter = e.target.dataset.filter;
+                    renderRepertorio();
+                }
+            });
+            document.getElementById('repertorioSearch').addEventListener('input', (e) => {
+                repertorioSearch = e.target.value;
+                renderRepertorio();
+            });
+
+            function saveSetlistMeta() {
+                const escalaId = document.getElementById('setlistEscala').value;
+                const escala = (appData.escalas || []).find(e => e.id === escalaId);
+                appData.setlistMeta = {
+                    escalaId,
+                    tipo: escala ? escala.tipo : 'dia',
+                    data: escala ? escala.data : new Date().toISOString().split('T')[0]
+                };
+                appData.setlist = escalaId && appData.setlistsByEscala ? (appData.setlistsByEscala[escalaId] || []) : [];
+                saveData(appData);
+                renderSetlist();
+                renderRepertorio();
+                renderResumo();
+            }
+            document.getElementById('setlistEscala').addEventListener('change', saveSetlistMeta);
+
+            // -- Aleatorizar Setlist --
+            document.getElementById('btnAleatorizar').addEventListener('click', () => {
+                const musicas = appData.repertorio || [];
+                if (!getSelectedEscala()) {
+                    showToast('⚠️ Selecione uma escala primeiro');
+                    return;
+                }
+                if (musicas.length === 0) {
+                    showToast('⚠️ Cadastre músicas primeiro');
+                    return;
+                }
+                const porCategoria = {
+                    'celebração': musicas.filter(m => m.categoria === 'celebração'),
+                    'meio-termo': musicas.filter(m => m.categoria === 'meio-termo'),
+                    'adoração': musicas.filter(m => m.categoria === 'adoração')
+                };
+                if (porCategoria['adoração'].length < 2 || musicas.length < 3) {
+                    showToast('⚠️ Para aleatorizar, tenha pelo menos 3 músicas e 2 de adoração');
+                    return;
+                }
+                const selected = [];
+                selected.push(...[...porCategoria['adoração']].sort(() => Math.random() - 0.5).slice(0, 2));
+                const abertura = [...porCategoria['celebração'], ...porCategoria['meio-termo']]
+                    .filter(m => !selected.some(s => s.id === m.id))
+                    .sort(() => Math.random() - 0.5);
+                selected.push(...abertura.slice(0, Math.min(2, abertura.length)));
+                const restante = musicas
+                    .filter(m => !selected.some(s => s.id === m.id))
+                    .sort(() => Math.random() - 0.5);
+                const count = Math.min(Math.max(3, Math.min(4, musicas.length)), Math.min(8, musicas.length));
+                selected.push(...restante.slice(0, Math.max(0, count - selected.length)));
+                setSetlistIds(selected.slice(0, count).map(m => m.id));
+                renderAll();
+                showToast('🎲 Setlist aleatória gerada com ' + count + ' músicas!');
+            });
+
+            // -- Limpar Setlist --
+            document.getElementById('btnLimparSetlist').addEventListener('click', () => {
+                if (!setSetlistIds([])) {
+                    showToast('⚠️ Selecione uma escala primeiro');
+                    return;
+                }
+                renderAll();
+                showToast('🗑️ Setlist limpa');
+            });
+
+            // -- Compartilhar / copiar aviso --
+            document.getElementById('btnCompartilharSetlist').addEventListener('click', async () => {
+                const setlistMusicas = getSelectedSetlistMusicas();
+                const escala = getSelectedEscala();
+                if (!escala) {
+                    showToast('⚠️ Selecione uma escala primeiro');
+                    return;
+                }
+                const data = new Date(escala.data + 'T00:00:00').toLocaleDateString('pt-BR');
+                const equipe = (escala.membrosIds || [])
+                    .map(id => (appData.equipe || []).find(m => m.id === id))
+                    .filter(Boolean)
+                    .map(m => m.nome);
+                const texto = [
+                    `Setlist de louvor (${escala.tipo} - ${data})`,
+                    equipe.length ? `Equipe: ${equipe.join(', ')}` : 'Equipe: ainda sem membros definidos',
+                    '',
+                    ...setlistMusicas.map((m, i) => `${i + 1}. ${m.nome}${m.tom ? ` - Tom ${m.tom}` : ''}${m.bpm ? ` - ${m.bpm} BPM` : ''}`),
+                    '',
+                    'Equipe, por favor confirmem disponibilidade.'
+                ].join('\n');
+
+                if (navigator.share) {
+                    await navigator.share({ title: 'Setlist de Louvor', text: texto });
+                    return;
+                }
+                await navigator.clipboard.writeText(texto);
+                showToast('📋 Aviso copiado para compartilhar');
+            });
+
+            // ============ INITIAL RENDER ============
+            renderAll();
+            switchTab('resumo');
+
+            // ============ HANDLE STORAGE CHANGES (cross-tab sync) ============
+            window.addEventListener('storage', (e) => {
+                if (e.key === STORAGE_KEY) {
+                    appData = getData();
+                    renderAll();
+                }
+            });
+
+            console.log('🎵 Louvor Organizer inicializado com sucesso!');
+            console.log('📊 Dados:', appData);
+            console.log('💡 Dica: Todos os dados são salvos automaticamente no navegador.');
+            console.log('📱 Funcionalidades: Equipe | Escalas | Repertório com Setlist | Aleatorizador');
+        })();
+    </script>
+</body>
+</html>
